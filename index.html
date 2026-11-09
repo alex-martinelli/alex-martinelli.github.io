@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alex Martinelli</title>
+<meta name="description" content="Alex Martinelli, Computer Engineering master's student at Politecnico di Torino working on robotics and multi-agent control.">
+<meta property="og:title" content="Alex Martinelli">
+<meta property="og:description" content="Computer Engineering master's student at Politecnico di Torino working on robotics and multi-agent control.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://alex-martinelli.github.io/img/alex.jpg">
+<style>
+@font-face{font-family:"Bricolage Grotesque";src:url("fonts/bricolage-grotesque-latin-800-normal.woff2") format("woff2");font-weight:800;font-display:swap}
+@font-face{font-family:"IBM Plex Sans";src:url("fonts/ibm-plex-sans-latin-400-normal.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"IBM Plex Sans";src:url("fonts/ibm-plex-sans-latin-600-normal.woff2") format("woff2");font-weight:600;font-display:swap}
+:root{
+  --paper:#eef2f6; --sheet:#fbfcfe; --ink:#10203f; --muted:#4d5b75; --rule:#c9d3e0;
+  --signal:#1a4fe0; --setpoint:#d99500;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --text:"IBM Plex Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--text)}
+a{color:var(--signal);text-underline-offset:3px;text-decoration-thickness:1.5px}
+a:hover{text-decoration-thickness:2.5px}
+a:focus-visible,button:focus-visible,.field:focus-visible{outline:3px solid var(--signal);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:var(--display);font-weight:800;letter-spacing:-.025em;margin:0}
+h1{font-size:clamp(46px,10.5vw,104px);line-height:.92;letter-spacing:-.04em}
+h2{font-size:clamp(28px,4.6vw,38px);line-height:1.1;margin-bottom:22px}
+h3{font-size:20px;line-height:1.2;letter-spacing:-.01em;color:var(--muted);margin:34px 0 6px}
+p{margin:0 0 14px;max-width:66ch}
+
+/* ---------- hero ---------- */
+.hero{padding:44px 0 26px;display:grid;gap:26px}
+.portrait{width:128px;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:16px;display:block;outline:2px dashed var(--setpoint);outline-offset:7px;margin:7px}
+.lead{font-size:clamp(19px,2.5vw,23px);line-height:1.45;max-width:34ch;margin:18px 0 6px}
+.open{color:var(--muted);max-width:44ch}
+.links{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin-top:18px;padding:0;list-style:none;font-weight:600}
+.btn{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;padding:11px 20px;border-radius:999px}
+.btn:hover{background:var(--signal)}
+@media (min-width:760px){
+  .hero{grid-template-columns:1fr 264px;align-items:end;gap:48px;padding:72px 0 36px}
+  .portrait{width:250px;justify-self:end;order:2}
+}
+
+/* ---------- formation field ---------- */
+.field{position:relative;height:270px;border:1.5px solid var(--ink);border-radius:18px;overflow:hidden;background-color:var(--sheet);
+  background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);
+  background-size:28px 28px;background-position:-1px -1px;cursor:crosshair;touch-action:manipulation}
+.field canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.caption{color:var(--muted);font-size:15px;margin:12px 0 0;max-width:70ch}
+@media (min-width:760px){.field{height:340px}}
+
+/* ---------- sections ---------- */
+section{padding:56px 0 8px}
+.about{display:grid;gap:26px}
+.facts{margin:0;padding:0;list-style:none;border-top:1.5px solid var(--ink)}
+.facts li{display:flex;justify-content:space-between;gap:18px;padding:11px 0;border-bottom:1px solid var(--rule)}
+.facts span:first-child{color:var(--muted)}
+.facts span:last-child{text-align:right;font-weight:600}
+@media (min-width:760px){.about{grid-template-columns:1fr 340px;gap:64px}}
+
+.featured{border:1.5px solid var(--ink);border-radius:18px;background:var(--sheet);padding:24px 24px 14px;margin-bottom:8px}
+.featured .name{font:800 clamp(28px,4.5vw,40px)/1.05 var(--display);letter-spacing:-.03em;margin:0 0 10px}
+.featured .name a{color:var(--ink)}
+.status{display:inline-block;font-size:14px;font-weight:600;color:#6b4a00;background:#fbe9bd;border-radius:999px;padding:3px 12px;margin-bottom:12px}
+
+.rows{margin:0;padding:0;list-style:none;border-top:1.5px solid var(--ink)}
+.rows li{padding:16px 0;border-bottom:1px solid var(--rule);display:grid;gap:4px}
+.rows .name{font-weight:600;font-size:19px;line-height:1.3}
+.rows .stack{color:var(--muted);font-size:15px}
+.rows p{margin:0}
+@media (min-width:760px){
+  .rows li{grid-template-columns:290px 1fr;gap:6px 40px;align-items:baseline}
+  .rows .stack{grid-column:1}
+  .rows p{grid-column:2;grid-row:1 / span 2}
+}
+.edu .when{color:var(--muted);font-variant-numeric:tabular-nums;font-size:15px}
+.skills{margin:0;padding:0;list-style:none;border-top:1.5px solid var(--ink)}
+.skills li{padding:13px 0;border-bottom:1px solid var(--rule);display:grid;gap:2px}
+.skills span:first-child{color:var(--muted)}
+@media (min-width:760px){.skills li{grid-template-columns:290px 1fr;gap:40px}}
+
+.contact{padding-bottom:28px}
+.contact .big{font:800 clamp(24px,5.4vw,46px)/1.1 var(--display);letter-spacing:-.03em;overflow-wrap:anywhere;margin:0 0 18px;max-width:none}
+.contact .big a{color:var(--ink)}
+footer{border-top:1px solid var(--rule);margin-top:40px;padding:22px 0 44px;color:var(--muted);font-size:15px}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <header class="hero">
+    <img class="portrait" src="img/alex.jpg" width="720" height="900" alt="Portrait of Alex Martinelli">
+    <div>
+      <h1>Alex Martinelli</h1>
+      <p class="lead">I'm a Computer Engineering master's student at Politecnico di Torino, working on robotics and multi-agent control.</p>
+      <p class="open">Open to master's thesis and internship opportunities abroad.</p>
+      <ul class="links">
+        <li><a class="btn" href="mailto:martinelli.alex.2701@gmail.com">Email me</a></li>
+        <li><a href="https://github.com/alex-martinelli">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/alex-martinelli-28a003251">LinkedIn</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="field" id="field" tabindex="0" role="img" aria-label="Animation of five simulated robots moving in a V formation. Click or tap to move the formation target.">
+    <canvas id="sim"></canvas>
+  </div>
+  <p class="caption">Five simulated unicycle robots holding a formation with feedback linearization, the idea behind my multi-agent simulator. Tap anywhere on the grid to send them there.</p>
+
+  <section aria-labelledby="about-h">
+    <h2 id="about-h">About</h2>
+    <div class="about">
+      <div>
+        <p>I study Automation and Intelligent Cyber-Physical Systems, and most of what I build sits between software and the physical world: simulators, embedded firmware, data-driven models and on-device AI.</p>
+        <p>I have hands-on experience with embedded systems in C and C++ on the ESP32, control design in MATLAB and Simulink, concurrent software in Rust with Tokio, and object-oriented design in Java.</p>
+        <p>I want to grow in robotics, and I'm looking for thesis and internship work abroad to do it.</p>
+      </div>
+      <ul class="facts">
+        <li><span>Studying</span><span>MSc Computer Engineering</span></li>
+        <li><span>University</span><span>Politecnico di Torino</span></li>
+        <li><span>Focus</span><span>Robotics, multi-agent control</span></li>
+        <li><span>English</span><span>B2 (Cambridge)</span></li>
+        <li><span>Spanish</span><span>Basics</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="projects-h">
+    <h2 id="projects-h">Projects</h2>
+
+    <article class="featured">
+      <span class="status">In closed testing on Google Play</span>
+      <p class="name"><a href="https://github.com/alex-martinelli/chevin-showcase">Chevin</a></p>
+      <p>An Android app that finds blurry and duplicate photos with on-device AI: quality filters, a NIMA aesthetic model, a taste model trained on the phone and duplicate grouping. I built the whole AI pipeline.</p>
+      <p class="stack" style="color:var(--muted);font-size:15px">Kotlin, TensorFlow Lite, OpenCV, ML Kit</p>
+    </article>
+
+    <h3>Robotics and control</h3>
+    <ul class="rows">
+      <li>
+        <a class="name" href="https://github.com/alex-martinelli/multi-agent-cps-simulator">Multi-agent CPS simulator</a>
+        <span class="stack">MATLAB, Simulink</span>
+        <p>Decentralized formation control of heterogeneous nonlinear mobile robots, using feedback linearization and pinning control.</p>
+      </li>
+      <li>
+        <span class="name">Robotic bottling cell with ABB</span>
+        <span class="stack">ABB RobotStudio, RAPID</span>
+        <p>Designed and simulated an automated beer bottling cell, programmed its multi-tasking logic in RAPID and configured the I/O networks that tie the robot to the external machinery.</p>
+      </li>
+    </ul>
+
+    <h3>Embedded</h3>
+    <ul class="rows">
+      <li>
+        <a class="name" href="https://github.com/alex-martinelli/esp32-smart-mirror">ESP32 smart mirror</a>
+        <span class="stack">C++, ESP32</span>
+        <p>A photo frame that wakes up when someone walks by: ultrasonic presence detection, a TFT display, images from an SD card and a temperature and humidity readout, with RAM usage kept under control.</p>
+      </li>
+    </ul>
+
+    <h3>Machine learning and data</h3>
+    <ul class="rows">
+      <li>
+        <a class="name" href="https://github.com/alex-martinelli/biometric-emotion-cnn">Biometric emotion CNN</a>
+        <span class="stack">Python, PyTorch</span>
+        <p>A convolutional network that predicts emotions from ECG and electrodermal signals, comparing early and late sensor fusion, with SHAP analysis.</p>
+      </li>
+      <li>
+        <span class="name">Introduction to causal reasoning</span>
+        <span class="stack">BSc thesis</span>
+        <p>A study of Structural Causal Models and of causal discovery with the PC algorithm, which uses conditional independence tests to tell correlation from cause and effect.</p>
+      </li>
+    </ul>
+
+    <h3>Software</h3>
+    <ul class="rows">
+      <li>
+        <a class="name" href="https://github.com/alex-martinelli/rust-fleet-tracker">Rust fleet tracker</a>
+        <span class="stack">Rust, Tokio, Walkers</span>
+        <p>A full-stack asynchronous fleet tracker with a concurrent Tokio backend and an interactive map client.</p>
+      </li>
+      <li>
+        <a class="name" href="https://github.com/alex-martinelli/java-tour-manager">Java tour manager</a>
+        <span class="stack">Java, Gson, JUnit 5</span>
+        <p>A guided-tour reservation system built with MVC, Strategy and State patterns and JSON persistence.</p>
+      </li>
+      <li>
+        <span class="name">Mathematical optimization</span>
+        <span class="stack">Java, Gurobi</span>
+        <p>A Java application that uses the Gurobi Optimizer to model and solve optimization problems on custom data instances.</p>
+      </li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="edu-h">
+    <h2 id="edu-h">Education</h2>
+    <ul class="rows edu">
+      <li>
+        <span class="name">MSc in Computer Engineering</span>
+        <span class="when">September 2025 to present</span>
+        <p>Politecnico di Torino. Track in Automation and Intelligent Cyber-Physical Systems.</p>
+      </li>
+      <li>
+        <span class="name">BSc in Computer Engineering</span>
+        <span class="when">September 2022 to September 2025</span>
+        <p>Università degli Studi di Brescia. Thesis: Introduction to Causal Reasoning.</p>
+      </li>
+      <li>
+        <span class="name">Scientific high school diploma</span>
+        <span class="when">September 2017 to June 2022</span>
+        <p>Liceo Scientifico Lorenzo Federici.</p>
+      </li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="skills-h">
+    <h2 id="skills-h">Skills</h2>
+    <ul class="skills">
+      <li><span>Languages</span><span>Python, Rust, Java, Kotlin, C and C++, MATLAB, SQL, Bash, ARM Assembly</span></li>
+      <li><span>Tools</span><span>Simulink, PyTorch, TensorFlow Lite, OpenCV, Tokio, Gurobi, Git, Linux</span></li>
+      <li><span>Hardware</span><span>ESP32, ultrasonic and DHT sensors, TFT displays</span></li>
+      <li><span>Also explored</span><span>Haskell, Prolog, Scheme</span></li>
+    </ul>
+  </section>
+
+  <section class="contact" aria-labelledby="contact-h">
+    <h2 id="contact-h">Contact</h2>
+    <p class="big"><a href="mailto:martinelli.alex.2701@gmail.com">martinelli.alex.2701@gmail.com</a></p>
+    <ul class="links">
+      <li><a href="https://github.com/alex-martinelli">github.com/alex-martinelli</a></li>
+      <li><a href="https://www.linkedin.com/in/alex-martinelli-28a003251">LinkedIn</a></li>
+    </ul>
+  </section>
+
+  <footer>© 2026 Alex Martinelli</footer>
+</main>
+
+<script>
+(function () {
+  var field = document.getElementById('field'), cv = document.getElementById('sim'), ctx = cv.getContext('2d');
+  var W = 0, H = 0, dpr = 1, t = 0, last = 0, running = false, visible = true;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var INK = '#10203f', SIGNAL = '#1a4fe0', SETPOINT = '#d99500';
+  var OFFSETS = [[0, 0], [-40, -32], [-40, 32], [-80, -64], [-80, 64]];
+  var B = 10, K = 2.2, VMAX = 170;          // look-ahead distance, gain, speed limit
+  var agents = [], target = { x: 0, y: 0, vx: 0, vy: 0 }, manual = null;
+
+  function resize() {
+    var r = field.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (!agents.length) init();
+    if (reduce) settle();
+    draw();
+  }
+  function path(time) {                       // slow figure-of-eight for the formation leader
+    var ax = Math.max(40, W / 2 - 150), ay = Math.max(20, H / 2 - 90);
+    return { x: W / 2 + 40 + ax * Math.sin(0.22 * time), y: H / 2 + ay * Math.sin(0.44 * time) };
+  }
+  function init() {
+    agents = OFFSETS.map(function () {
+      return { x: 30 + Math.random() * (W - 60), y: 30 + Math.random() * (H - 60), th: Math.random() * 6.283, trail: [] };
+    });
+    var p = path(0); target.x = p.x; target.y = p.y;
+  }
+  function settle() {
+    var p = path(0.9); target.x = p.x; target.y = p.y;
+    agents.forEach(function (a, i) { a.x = p.x + OFFSETS[i][0] - B; a.y = p.y + OFFSETS[i][1]; a.th = 0; a.trail = []; });
+  }
+  function step(dt) {
+    t += dt;
+    var goal = path(t), px = target.x, py = target.y;
+    if (manual) {
+      goal = manual;
+      if (t > manual.until) manual = null;
+    }
+    var ease = Math.min(1, dt * (manual ? 3.5 : 1.6));
+    target.x += (goal.x - target.x) * ease; target.y += (goal.y - target.y) * ease;
+    target.vx = (target.x - px) / dt; target.vy = (target.y - py) / dt;
+
+    agents.forEach(function (a, i) {
+      var c = Math.cos(a.th), s = Math.sin(a.th);
+      var hx = a.x + B * c, hy = a.y + B * s;                         // look-ahead point
+      var ux = K * (target.x + OFFSETS[i][0] - hx) + target.vx;      // desired velocity of that point
+      var uy = K * (target.y + OFFSETS[i][1] - hy) + target.vy;
+      agents.forEach(function (o) {                                   // keep a little distance
+        if (o === a) return;
+        var dx = a.x - o.x, dy = a.y - o.y, d = Math.hypot(dx, dy);
+        if (d < 30 && d > 0.01) { ux += (dx / d) * (30 - d) * 6; uy += (dy / d) * (30 - d) * 6; }
+      });
+      var n = Math.hypot(ux, uy);
+      if (n > VMAX) { ux *= VMAX / n; uy *= VMAX / n; }
+      var v = ux * c + uy * s, w = (-ux * s + uy * c) / B;           // feedback linearization
+      a.x += v * c * dt; a.y += v * s * dt; a.th += w * dt;
+      a.trail.push(a.x, a.y);
+      if (a.trail.length > 150) a.trail.splice(0, 2);
+    });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    agents.forEach(function (a) {                                     // trails
+      var tr = a.trail, n = tr.length / 2;
+      for (var k = 1; k < n; k++) {
+        ctx.globalAlpha = 0.55 * k / n;
+        ctx.strokeStyle = SIGNAL; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(tr[2 * k - 2], tr[2 * k - 1]); ctx.lineTo(tr[2 * k], tr[2 * k + 1]); ctx.stroke();
+      }
+    });
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = SETPOINT; ctx.lineWidth = 1.6; ctx.setLineDash([5, 6]);   // reference formation
+    ctx.beginPath();
+    [3, 1, 0, 2, 4].forEach(function (i, k) {
+      var x = target.x + OFFSETS[i][0], y = target.y + OFFSETS[i][1];
+      if (k) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+    });
+    ctx.stroke(); ctx.setLineDash([]);
+    OFFSETS.forEach(function (o) {
+      ctx.beginPath(); ctx.arc(target.x + o[0], target.y + o[1], 13, 0, 6.283); ctx.stroke();
+    });
+    agents.forEach(function (a) {                                     // robots
+      ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(a.th);
+      ctx.fillStyle = INK;
+      ctx.beginPath(); ctx.moveTo(13, 0); ctx.lineTo(-8, 8); ctx.lineTo(-4, 0); ctx.lineTo(-8, -8); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    });
+  }
+  function frame(now) {
+    if (!running) return;
+    var dt = Math.min(0.033, Math.max(0.001, (now - last) / 1000)); last = now;
+    step(dt); draw();
+    requestAnimationFrame(frame);
+  }
+  function setRunning() {
+    var should = visible && !document.hidden && !reduce;
+    if (should && !running) { running = true; last = performance.now(); requestAnimationFrame(frame); }
+    else if (!should) running = false;
+  }
+  function point(e) {
+    var r = field.getBoundingClientRect();
+    manual = { x: Math.max(96, Math.min(W - 20, e.clientX - r.left)), y: Math.max(80, Math.min(H - 80, e.clientY - r.top)), until: t + 6 };
+    if (reduce) { target.x = manual.x; target.y = manual.y; agents.forEach(function (a, i) { a.x = target.x + OFFSETS[i][0] - B; a.y = target.y + OFFSETS[i][1]; a.th = 0; }); draw(); }
+  }
+  field.addEventListener('pointerdown', point);
+  window.addEventListener('resize', resize);
+  document.addEventListener('visibilitychange', setRunning);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) { visible = es[0].isIntersecting; setRunning(); }).observe(field);
+  }
+  resize(); setRunning();
+})();
+</script>
+</body>
+</html>
