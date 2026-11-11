@@ -45,13 +45,29 @@ p{margin:0 0 14px;max-width:66ch}
   .portrait{width:250px;justify-self:end;order:2}
 }
 
-/* ---------- formation field ---------- */
-.field{position:relative;height:270px;border:1.5px solid var(--ink);border-radius:18px;overflow:hidden;background-color:var(--sheet);
-  background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);
-  background-size:28px 28px;background-position:-1px -1px;cursor:crosshair;touch-action:manipulation}
+/* ---------- formation simulation ---------- */
+.sim{margin:0}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;margin-bottom:12px}
+.seg{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.seg-label{color:var(--muted);font-size:15px;margin-right:4px}
+.seg button,.restart{font:600 15px/1 var(--text);color:var(--ink);background:var(--sheet);border:1.5px solid var(--rule);border-radius:999px;padding:8px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.seg button:hover,.restart:hover{border-color:var(--ink)}
+.check{display:flex;align-items:center;gap:8px;font-size:15px;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--ink)}
+.restart{margin-left:auto}
+.field{position:relative;height:340px;border:1.5px solid var(--ink);border-radius:18px;overflow:hidden;background:var(--sheet)}
 .field canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.caption{color:var(--muted);font-size:15px;margin:12px 0 0;max-width:70ch}
-@media (min-width:760px){.field{height:340px}}
+.clock{position:absolute;right:14px;bottom:10px;margin:0;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.errors{display:grid;gap:10px;margin-top:12px}
+.errors canvas{width:100%;height:150px;display:block}
+.legend{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;color:var(--muted)}
+.legend b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;margin-left:4px}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:7px}
+.k1{background:#1a4fe0}.k2{background:#0f8a6a}.k3{background:#c2410c}
+.caption{color:var(--muted);font-size:15px;margin:14px 0 0;max-width:72ch}
+button:focus-visible,input:focus-visible{outline:3px solid var(--signal);outline-offset:3px}
+@media (min-width:760px){.field{height:440px}.errors{grid-template-columns:1fr 250px;align-items:center}.legend{flex-direction:column}}
 
 /* ---------- sections ---------- */
 section{padding:56px 0 8px}
@@ -106,10 +122,37 @@ footer{border-top:1px solid var(--rule);margin-top:40px;padding:22px 0 44px;colo
     </div>
   </header>
 
-  <div class="field" id="field" tabindex="0" role="img" aria-label="Animation of five simulated robots moving in a V formation. Click or tap to move the formation target.">
-    <canvas id="sim"></canvas>
-  </div>
-  <p class="caption">Five simulated unicycle robots holding a formation with feedback linearization, the idea behind my multi-agent simulator. Tap anywhere on the grid to send them there.</p>
+  <figure class="sim" aria-labelledby="sim-cap">
+    <div class="sim-controls">
+      <div class="seg" role="group" aria-label="Controller">
+        <span class="seg-label">Controller</span>
+        <button type="button" data-ctrl="sf" aria-pressed="false">State feedback</button>
+        <button type="button" data-ctrl="pd" aria-pressed="true">PD</button>
+        <button type="button" data-ctrl="pid" aria-pressed="false">PID</button>
+      </div>
+      <div class="seg" role="group" aria-label="Disturbance">
+        <span class="seg-label">Disturbance</span>
+        <button type="button" data-dist="none" aria-pressed="false">None</button>
+        <button type="button" data-dist="const" aria-pressed="true">Constant</button>
+        <button type="button" data-dist="sin" aria-pressed="false">Sinusoidal</button>
+      </div>
+      <label class="check"><input type="checkbox" id="noise"> Sensor noise</label>
+      <button type="button" class="restart" id="restart">Restart</button>
+    </div>
+    <div class="field" id="field">
+      <canvas id="sim" role="img" aria-label="Three robots starting apart, converging into a triangle formation and following a circular path."></canvas>
+      <p class="clock" id="clock" aria-hidden="true">t = 0.0 s</p>
+    </div>
+    <div class="errors">
+      <canvas id="err" role="img" aria-label="Tracking and formation errors over 30 seconds on a logarithmic scale."></canvas>
+      <ul class="legend" id="legend">
+        <li><i class="k1"></i>Leader tracking error <b id="e1">–</b></li>
+        <li><i class="k2"></i>Robot 2 formation error <b id="e2">–</b></li>
+        <li><i class="k3"></i>Robot 3 formation error <b id="e3">–</b></li>
+      </ul>
+    </div>
+    <figcaption id="sim-cap" class="caption">My Modeling and Control of Cyber-Physical Systems project, running live in your browser. Three robots with different nonlinear dynamics are feedback-linearized into double integrators. A distributed controller on the chain 1 → 2 → 3 then holds a 2 m triangle while the leader tracks a circle. The models, gains and disturbances are the ones in my MATLAB code, and the final errors match its results. Try a constant disturbance with each controller: only PID pulls the leader's error down to millimetres, while the followers keep a small offset because the integral action sits on the leader alone.</figcaption>
+  </figure>
 
   <section aria-labelledby="about-h">
     <h2 id="about-h">About</h2>
@@ -220,10 +263,14 @@ footer{border-top:1px solid var(--rule);margin-top:40px;padding:22px 0 44px;colo
   <section aria-labelledby="skills-h">
     <h2 id="skills-h">Skills</h2>
     <ul class="skills">
-      <li><span>Languages</span><span>Python, Rust, Java, C and C++, MATLAB, SQL, Bash, ARM Assembly</span></li>
-      <li><span>Tools</span><span>Simulink, PyTorch, TensorFlow Lite, OpenCV, Tokio, Gurobi, Git, Linux</span></li>
-      <li><span>Hardware</span><span>ESP32, ultrasonic and DHT sensors, TFT displays</span></li>
-      <li><span>Also explored</span><span>Haskell, Prolog, Scheme</span></li>
+      <li><span>Systems and embedded</span><span>C, C++, Rust, ARM assembly, MIPS assembly</span></li>
+      <li><span>Object-oriented</span><span>Java, Kotlin</span></li>
+      <li><span>Data and machine learning</span><span>Python, SQL</span></li>
+      <li><span>Control and robotics</span><span>MATLAB, Simulink, ROS 2</span></li>
+      <li><span>Functional and logic</span><span>Haskell, Scheme, Prolog</span></li>
+      <li><span>Scripting</span><span>Bash</span></li>
+      <li><span>Libraries and tools</span><span>PyTorch, TensorFlow Lite, OpenCV, Tokio, Gurobi, Git, Linux</span></li>
+      <li><span>Hardware</span><span>ESP32, ARM Cortex-M3 (LPC1768), TurtleBot3</span></li>
     </ul>
   </section>
 
@@ -241,119 +288,251 @@ footer{border-top:1px solid var(--rule);margin-top:40px;padding:22px 0 44px;colo
 
 <script>
 (function () {
-  var field = document.getElementById('field'), cv = document.getElementById('sim'), ctx = cv.getContext('2d');
-  var W = 0, H = 0, dpr = 1, t = 0, last = 0, running = false, visible = true;
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var INK = '#10203f', SIGNAL = '#1a4fe0', SETPOINT = '#d99500';
-  var OFFSETS = [[0, 0], [-40, -32], [-40, 32], [-80, -64], [-80, 64]];
-  var B = 10, K = 2.2, VMAX = 170;          // look-ahead distance, gain, speed limit
-  var agents = [], target = { x: 0, y: 0, vx: 0, vy: 0 }, manual = null;
+  // ---- parameters from multiagents.m / multiagents_cond.m ----
+  var GAMMA = 1.2, ELL = 2, RC = 3, OMR = 0.4, CX = 5, CY = 5, T_END = 30, DT = 0.004;
+  var GAINS = {                                    // [Kp, Kd] on position / velocity error
+    sf: [6.3246, 3.8274],                          // LQR, Q = diag(20,1), R = 0.5, c = 1
+    pd: [64 / 3.236, 8 * 0.951],                   // loop shaping, wc = 8 rad/s, rho_min = 1
+    pid: [64 / 3.236, 8 * 0.951]
+  };
+  var KI = (64 / 3.236) / 10;                      // integral action on the leader only
+  var H = [[0, 0], [-ELL * Math.sqrt(3) / 2, -ELL / 2], [-ELL * Math.sqrt(3) / 2, ELL / 2]];
+  var NEIGH = [[], [0], [1]];                      // in-neighbours: chain 1 -> 2 -> 3
+  var X0 = [[CX + RC, 0, CY, 0], [2, 0, -1, 0], [-1, 0, 3, 0]];
 
+  function ref(t) {
+    var c = Math.cos(OMR * t), s = Math.sin(OMR * t);
+    return { p: [CX + RC * c, CY + RC * s], v: [-RC * OMR * s, RC * OMR * c], a: [-RC * OMR * OMR * c, -RC * OMR * OMR * s] };
+  }
+  // drift phi_i(x) and decoupling matrix B_i(x) of each agent (agents.m); x = [px, vx, py, vy]
+  function model(i, x) {
+    var px = x[0], vx = x[1], py = x[2], vy = x[3];
+    if (i === 0) return { phi: [-0.35 * vx - 0.08 * vx * Math.abs(vx), -0.45 * vy - 0.1 * vy * Math.abs(vy)], B: [[1 / 1.2, 0], [0, 1 / 1.2]] };
+    if (i === 1) {
+      var sx = Math.sin(px), cy = Math.cos(py);
+      return { phi: [-0.4 * vx, -0.55 * vy], B: [[1 / (1 + 0.25 * sx * sx), 0], [0, 1 / (1 + 0.3 * cy * cy)]] };
+    }
+    var cy3 = Math.cos(py), sx3 = Math.sin(px);
+    return {
+      phi: [-0.3 * vx + 0.15 * Math.sin(py) * vy, -0.35 * vy + 0.15 * Math.cos(px) * vx],
+      B: [[1 + 0.2 * cy3 * cy3, 0.08 * sx3], [0.08 * Math.sin(py), 1 + 0.2 * sx3 * sx3]]
+    };
+  }
+  function solve2(B, r) {                          // B^-1 r
+    var det = B[0][0] * B[1][1] - B[0][1] * B[1][0];
+    return [(B[1][1] * r[0] - B[0][1] * r[1]) / det, (B[0][0] * r[1] - B[1][0] * r[0]) / det];
+  }
+  function dist(kind, t) {
+    if (kind === 'const') return [0.5, 0.3];
+    if (kind === 'sin') return [1.5 * Math.sin(2 * t), Math.cos(4 * t)];
+    return [0, 0];
+  }
+
+  var cfg = { ctrl: 'pd', dist: 'const', noise: false };
+  var S, z, t, noiseSample, hist, trails;
+
+  function reset() {
+    S = X0.map(function (x) { return x.slice(); });
+    z = [0, 0]; t = 0; hist = []; trails = [[], [], []]; noiseSample = [[0, 0], [0, 0], [0, 0]];
+  }
+  function gauss() { var u = 1 - Math.random(), v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.2832 * v); }
+
+  // derivative of [3 agents x 4 states] + leader integrator
+  function deriv(state, zi, time) {
+    var r = ref(time), K = GAINS[cfg.ctrl], d = dist(cfg.dist, time), out = [], dz = [0, 0];
+    for (var i = 0; i < 3; i++) {
+      var xi = state[i], nu = [0, 0];
+      var mi = [xi[0] + noiseSample[i][0], xi[2] + noiseSample[i][1]];
+      NEIGH[i].forEach(function (j) {
+        var xj = state[j], mj = [xj[0] + noiseSample[j][0], xj[2] + noiseSample[j][1]];
+        for (var a = 0; a < 2; a++) {
+          var ep = (mj[a] - mi[a]) - (H[j][a] - H[i][a]);
+          var ev = xj[2 * a + 1] - xi[2 * a + 1];
+          nu[a] += K[0] * ep + K[1] * ev;
+        }
+      });
+      for (var a2 = 0; a2 < 2; a2++) {
+        nu[a2] += r.a[a2];                          // feed-forward broadcast
+        if (i === 0) {
+          nu[a2] += GAMMA * (K[0] * (r.p[a2] - mi[a2]) + K[1] * (r.v[a2] - xi[2 * a2 + 1]));
+          if (cfg.ctrl === 'pid') nu[a2] -= KI * zi[a2];
+        }
+      }
+      var m = model(i, xi);
+      var u = solve2(m.B, [nu[0] - m.phi[0], nu[1] - m.phi[1]]);   // feedback linearization
+      var acc = [
+        m.phi[0] + m.B[0][0] * u[0] + m.B[0][1] * u[1] + d[0],      // true nonlinear plant
+        m.phi[1] + m.B[1][0] * u[0] + m.B[1][1] * u[1] + d[1]
+      ];
+      out.push([xi[1], acc[0], xi[3], acc[1]]);
+      if (i === 0) dz = [xi[0] - r.p[0], xi[2] - r.p[1]];
+    }
+    return { dx: out, dz: dz };
+  }
+  function add(state, zi, k, h) {
+    return {
+      s: state.map(function (x, i) { return x.map(function (v, n) { return v + h * k.dx[i][n]; }); }),
+      z: [zi[0] + h * k.dz[0], zi[1] + h * k.dz[1]]
+    };
+  }
+  function step() {
+    noiseSample = cfg.noise ? [0, 1, 2].map(function () { return [0.02 * gauss(), 0.02 * gauss()]; }) : [[0, 0], [0, 0], [0, 0]];
+    var k1 = deriv(S, z, t), a = add(S, z, k1, DT / 2);
+    var k2 = deriv(a.s, a.z, t + DT / 2), b = add(S, z, k2, DT / 2);
+    var k3 = deriv(b.s, b.z, t + DT / 2), c = add(S, z, k3, DT);
+    var k4 = deriv(c.s, c.z, t + DT);
+    for (var i = 0; i < 3; i++) for (var n = 0; n < 4; n++)
+      S[i][n] += DT / 6 * (k1.dx[i][n] + 2 * k2.dx[i][n] + 2 * k3.dx[i][n] + k4.dx[i][n]);
+    for (var q = 0; q < 2; q++) z[q] += DT / 6 * (k1.dz[q] + 2 * k2.dz[q] + 2 * k3.dz[q] + k4.dz[q]);
+    t += DT;
+  }
+  function errors() {
+    var r = ref(t), x1 = S[0];
+    var e1 = Math.hypot(r.p[0] - x1[0], r.v[0] - x1[1], r.p[1] - x1[2], r.v[1] - x1[3]);   // norm(xr - x1)
+    function ef(i) { var xi = S[i]; return Math.hypot((xi[0] - x1[0]) - H[i][0], xi[1] - x1[1], (xi[2] - x1[2]) - H[i][1], xi[3] - x1[3]); }
+    return [e1, ef(1), ef(2)];
+  }
+
+  // ---------------- drawing ----------------
+  var field = document.getElementById('field'), cv = document.getElementById('sim'), ctx = cv.getContext('2d');
+  var ecv = document.getElementById('err'), ectx = ecv.getContext('2d');
+  var INK = '#10203f', SIGNAL = '#1a4fe0', SET = '#d99500', RULE = '#c9d3e0', MUTED = '#4d5b75';
+  var COL = ['#1a4fe0', '#0f8a6a', '#c2410c'];
+  var W, Hh, dpr, view, EW, EH;
+  var WX = [-2.2, 9.6], WY = [-2.2, 9.2];
+
+  function fit(canvas, c, w, h) {
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
   function resize() {
-    var r = field.getBoundingClientRect();
     dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = r.width; H = r.height;
-    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    if (!agents.length) init();
-    if (reduce) settle();
+    var r = field.getBoundingClientRect(); W = r.width; Hh = r.height; fit(cv, ctx, W, Hh);
+    var pad = 18, sx = (W - 2 * pad) / (WX[1] - WX[0]), sy = (Hh - 2 * pad) / (WY[1] - WY[0]), s = Math.min(sx, sy);
+    view = { s: s, ox: (W - s * (WX[1] - WX[0])) / 2 - s * WX[0], oy: (Hh + s * (WY[1] - WY[0])) / 2 + s * WY[0] };
+    var er = ecv.getBoundingClientRect(); EW = er.width; EH = er.height; fit(ecv, ectx, EW, EH);
     draw();
   }
-  function path(time) {                       // slow figure-of-eight for the formation leader
-    var ax = Math.max(40, W / 2 - 150), ay = Math.max(20, H / 2 - 90);
-    return { x: W / 2 + 40 + ax * Math.sin(0.22 * time), y: H / 2 + ay * Math.sin(0.44 * time) };
-  }
-  function init() {
-    agents = OFFSETS.map(function () {
-      return { x: 30 + Math.random() * (W - 60), y: 30 + Math.random() * (H - 60), th: Math.random() * 6.283, trail: [] };
-    });
-    var p = path(0); target.x = p.x; target.y = p.y;
-  }
-  function settle() {
-    var p = path(0.9); target.x = p.x; target.y = p.y;
-    agents.forEach(function (a, i) { a.x = p.x + OFFSETS[i][0] - B; a.y = p.y + OFFSETS[i][1]; a.th = 0; a.trail = []; });
-  }
-  function step(dt) {
-    t += dt;
-    var goal = path(t), px = target.x, py = target.y;
-    if (manual) {
-      goal = manual;
-      if (t > manual.until) manual = null;
-    }
-    var ease = Math.min(1, dt * (manual ? 3.5 : 1.6));
-    target.x += (goal.x - target.x) * ease; target.y += (goal.y - target.y) * ease;
-    target.vx = (target.x - px) / dt; target.vy = (target.y - py) / dt;
+  function P(x, y) { return [view.ox + view.s * x, view.oy - view.s * y]; }
 
-    agents.forEach(function (a, i) {
-      var c = Math.cos(a.th), s = Math.sin(a.th);
-      var hx = a.x + B * c, hy = a.y + B * s;                         // look-ahead point
-      var ux = K * (target.x + OFFSETS[i][0] - hx) + target.vx;      // desired velocity of that point
-      var uy = K * (target.y + OFFSETS[i][1] - hy) + target.vy;
-      agents.forEach(function (o) {                                   // keep a little distance
-        if (o === a) return;
-        var dx = a.x - o.x, dy = a.y - o.y, d = Math.hypot(dx, dy);
-        if (d < 30 && d > 0.01) { ux += (dx / d) * (30 - d) * 6; uy += (dy / d) * (30 - d) * 6; }
-      });
-      var n = Math.hypot(ux, uy);
-      if (n > VMAX) { ux *= VMAX / n; uy *= VMAX / n; }
-      var v = ux * c + uy * s, w = (-ux * s + uy * c) / B;           // feedback linearization
-      a.x += v * c * dt; a.y += v * s * dt; a.th += w * dt;
-      a.trail.push(a.x, a.y);
-      if (a.trail.length > 150) a.trail.splice(0, 2);
-    });
-  }
   function draw() {
-    ctx.clearRect(0, 0, W, H);
-    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    agents.forEach(function (a) {                                     // trails
-      var tr = a.trail, n = tr.length / 2;
-      for (var k = 1; k < n; k++) {
-        ctx.globalAlpha = 0.55 * k / n;
-        ctx.strokeStyle = SIGNAL; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(tr[2 * k - 2], tr[2 * k - 1]); ctx.lineTo(tr[2 * k], tr[2 * k + 1]); ctx.stroke();
+    if (!view) return;
+    ctx.clearRect(0, 0, W, Hh);
+    ctx.lineWidth = 1; ctx.strokeStyle = RULE;                      // 1 m grid
+    var x0 = (0 - view.ox) / view.s, x1 = (W - view.ox) / view.s, y0 = (view.oy - Hh) / view.s, y1 = view.oy / view.s;
+    for (var gx = Math.ceil(x0); gx <= x1; gx++) { var a = P(gx, y0), b = P(gx, y1); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
+    for (var gy = Math.ceil(y0); gy <= y1; gy++) { var c = P(x0, gy), d = P(x1, gy); ctx.beginPath(); ctx.moveTo(c[0], c[1]); ctx.lineTo(d[0], d[1]); ctx.stroke(); }
+
+    var ctr = P(CX, CY);                                             // reference circle
+    ctx.strokeStyle = SET; ctx.lineWidth = 1.6; ctx.setLineDash([6, 6]);
+    ctx.beginPath(); ctx.arc(ctr[0], ctr[1], RC * view.s, 0, 6.2832); ctx.stroke();
+    var r = ref(t), tri = [0, 1, 2, 0].map(function (i) { return P(r.p[0] + H[i][0], r.p[1] + H[i][1]); });
+    ctx.beginPath(); tri.forEach(function (p, k) { if (k) ctx.lineTo(p[0], p[1]); else ctx.moveTo(p[0], p[1]); }); ctx.stroke();
+    ctx.setLineDash([]);
+    [0, 1, 2].forEach(function (i) { var p = P(r.p[0] + H[i][0], r.p[1] + H[i][1]); ctx.beginPath(); ctx.arc(p[0], p[1], 10, 0, 6.2832); ctx.stroke(); });
+
+    ctx.lineCap = 'round';                                           // trails
+    trails.forEach(function (tr, i) {
+      ctx.strokeStyle = COL[i]; ctx.lineWidth = 2;
+      for (var k = 2; k < tr.length; k += 2) {
+        ctx.globalAlpha = 0.6 * k / tr.length;
+        var p0 = P(tr[k - 2], tr[k - 1]), p1 = P(tr[k], tr[k + 1]);
+        ctx.beginPath(); ctx.moveTo(p0[0], p0[1]); ctx.lineTo(p1[0], p1[1]); ctx.stroke();
       }
     });
     ctx.globalAlpha = 1;
-    ctx.strokeStyle = SETPOINT; ctx.lineWidth = 1.6; ctx.setLineDash([5, 6]);   // reference formation
-    ctx.beginPath();
-    [3, 1, 0, 2, 4].forEach(function (i, k) {
-      var x = target.x + OFFSETS[i][0], y = target.y + OFFSETS[i][1];
-      if (k) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+
+    [[0, 1], [1, 2]].forEach(function (e) {                         // communication links
+      var p = P(S[e[0]][0], S[e[0]][2]), q = P(S[e[1]][0], S[e[1]][2]);
+      var dx = q[0] - p[0], dy = q[1] - p[1], L = Math.hypot(dx, dy);
+      if (L < 30) return;
+      var ux = dx / L, uy = dy / L, a = [p[0] + ux * 14, p[1] + uy * 14], b = [q[0] - ux * 16, q[1] - uy * 16];
+      ctx.strokeStyle = MUTED; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+      ctx.fillStyle = MUTED; ctx.beginPath();
+      ctx.moveTo(b[0], b[1]); ctx.lineTo(b[0] - ux * 8 - uy * 4, b[1] - uy * 8 + ux * 4); ctx.lineTo(b[0] - ux * 8 + uy * 4, b[1] - uy * 8 - ux * 4); ctx.fill();
     });
-    ctx.stroke(); ctx.setLineDash([]);
-    OFFSETS.forEach(function (o) {
-      ctx.beginPath(); ctx.arc(target.x + o[0], target.y + o[1], 13, 0, 6.283); ctx.stroke();
+    S.forEach(function (x, i) {                                      // robots
+      var p = P(x[0], x[2]);
+      ctx.fillStyle = COL[i]; ctx.beginPath(); ctx.arc(p[0], p[1], 11, 0, 6.2832); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = '700 12px "IBM Plex Sans", system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(String(i + 1), p[0], p[1] + 0.5);
     });
-    agents.forEach(function (a) {                                     // robots
-      ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(a.th);
-      ctx.fillStyle = INK;
-      ctx.beginPath(); ctx.moveTo(13, 0); ctx.lineTo(-8, 8); ctx.lineTo(-4, 0); ctx.lineTo(-8, -8); ctx.closePath(); ctx.fill();
-      ctx.restore();
-    });
+    drawErrors();
+  }
+
+  var LOG_MIN = -3, LOG_MAX = 1;
+  function drawErrors() {
+    var c = ectx, L = 44, R = 20, T = 8, B = 22, w = EW - L - R, h = EH - T - B;
+    c.clearRect(0, 0, EW, EH);
+    c.font = '12px "IBM Plex Sans", system-ui, sans-serif'; c.fillStyle = MUTED; c.textAlign = 'right'; c.textBaseline = 'middle';
+    for (var e = LOG_MIN; e <= LOG_MAX; e++) {
+      var y = T + h * (LOG_MAX - e) / (LOG_MAX - LOG_MIN);
+      c.strokeStyle = RULE; c.lineWidth = 1; c.beginPath(); c.moveTo(L, y); c.lineTo(L + w, y); c.stroke();
+      c.fillText(e === 0 ? '1 m' : (e > 0 ? '10 m' : (e === -1 ? '10 cm' : (e === -2 ? '1 cm' : '1 mm'))), L - 6, y);
+    }
+    c.textAlign = 'center'; c.textBaseline = 'top';
+    for (var s = 0; s <= T_END; s += 5) c.fillText(s + ' s', L + w * s / T_END, T + h + 6);
+    for (var k = 0; k < 3; k++) {
+      c.strokeStyle = COL[k]; c.lineWidth = 1.8; c.beginPath();
+      for (var n = 0; n < hist.length; n++) {
+        var v = Math.max(1e-3, Math.min(10, hist[n][k + 1]));
+        var px = L + w * hist[n][0] / T_END, py = T + h * (LOG_MAX - Math.log10(v)) / (LOG_MAX - LOG_MIN);
+        if (n) c.lineTo(px, py); else c.moveTo(px, py);
+      }
+      c.stroke();
+    }
+  }
+  function fmt(v) { return v >= 1 ? v.toFixed(2) + ' m' : (v >= 0.01 ? (v * 100).toFixed(1) + ' cm' : (v * 1000).toFixed(1) + ' mm'); }
+  var clockEl = document.getElementById('clock'), eEls = [document.getElementById('e1'), document.getElementById('e2'), document.getElementById('e3')];
+  function readout() {
+    var e = errors();
+    for (var i = 0; i < 3; i++) eEls[i].textContent = fmt(e[i]);
+    clockEl.textContent = 't = ' + t.toFixed(1) + ' s';
+  }
+
+  // ---------------- loop ----------------
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var running = false, visible = true, last = 0, hold = 0, sampleT = 0;
+  function advance(seconds) {
+    var n = Math.round(seconds / DT);
+    for (var i = 0; i < n && t < T_END; i++) {
+      step();
+      if (t >= sampleT) {
+        var e = errors(); hist.push([t, e[0], e[1], e[2]]); sampleT += 0.05;
+        S.forEach(function (x, j) { trails[j].push(x[0], x[2]); if (trails[j].length > 360) trails[j].splice(0, 2); });
+      }
+    }
   }
   function frame(now) {
     if (!running) return;
-    var dt = Math.min(0.033, Math.max(0.001, (now - last) / 1000)); last = now;
-    step(dt); draw();
+    var dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (t < T_END) advance(dt);
+    else if ((hold += dt) > 3) { hold = 0; restart(); }
+    draw(); readout();
     requestAnimationFrame(frame);
   }
+  function restart() { reset(); sampleT = 0; hold = 0; if (reduce) { advance(T_END); } draw(); readout(); }
   function setRunning() {
     var should = visible && !document.hidden && !reduce;
     if (should && !running) { running = true; last = performance.now(); requestAnimationFrame(frame); }
     else if (!should) running = false;
   }
-  function point(e) {
-    var r = field.getBoundingClientRect();
-    manual = { x: Math.max(96, Math.min(W - 20, e.clientX - r.left)), y: Math.max(80, Math.min(H - 80, e.clientY - r.top)), until: t + 6 };
-    if (reduce) { target.x = manual.x; target.y = manual.y; agents.forEach(function (a, i) { a.x = target.x + OFFSETS[i][0] - B; a.y = target.y + OFFSETS[i][1]; a.th = 0; }); draw(); }
-  }
-  field.addEventListener('pointerdown', point);
+
+  document.querySelectorAll('[data-ctrl],[data-dist]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.hasAttribute('data-ctrl') ? 'ctrl' : 'dist';
+      cfg[key] = btn.getAttribute('data-' + key);
+      document.querySelectorAll('[data-' + key + ']').forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
+      restart();
+    });
+  });
+  document.getElementById('noise').addEventListener('change', function (e) { cfg.noise = e.target.checked; restart(); });
+  document.getElementById('restart').addEventListener('click', restart);
   window.addEventListener('resize', resize);
   document.addEventListener('visibilitychange', setRunning);
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (es) { visible = es[0].isIntersecting; setRunning(); }).observe(field);
-  }
-  resize(); setRunning();
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; setRunning(); }).observe(field);
+  reset(); resize(); restart(); setRunning();
 })();
 </script>
 </body>
